@@ -1,0 +1,65 @@
+project.apply plugin: 'org.jetbrains.kotlin.multiplatform'
+
+project.apply plugin: 'com.android.library'
+
+android {
+    buildToolsVersion '28.0.3'
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 1
+    }
+}
+
+group = "mvireaktive"
+version = "0.1"
+
+kotlin {
+    targets {
+        fromPreset(presets.android, 'android')
+        fromPreset(presets.jvm, 'jvm')
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+                implementation project(":reaktmvi")
+                implementation 'com.badoo.reaktive:reaktive:1.1.2'
+                implementation 'com.badoo.reaktive:reaktive-testing:1.1.2'
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-test-common:$kotlin_version"
+                implementation "org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlin_version"
+            }
+        }
+
+        androidMain {
+            dependsOn jvmMain
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+            }
+        }
+        androidTest {
+            dependsOn jvmTest
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+            }
+        }
+
+        jvmMain {
+            dependsOn commonMain
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+            }
+        }
+        jvmTest {
+            dependsOn commonTest
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+            }
+        }
+    }
+}
