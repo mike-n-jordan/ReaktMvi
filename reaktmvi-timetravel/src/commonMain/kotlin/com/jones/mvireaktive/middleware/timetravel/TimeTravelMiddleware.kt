@@ -48,7 +48,7 @@ class TimeTravelMiddleware() : Middleware {
     ): StoreConfig<State, Input, Output> {
         val timeTravelRelay = TimeTravelInputRelay(store)
         val newStore = store.copy(
-            actions = store.actions.mapValues { wrapAction(it.value) },
+            events = store.events.mapValues { wrapAction(it.value) },
             postActions = store.postActions.map { wrapPost(it) },
             inputPublisher = timeTravelRelay
         )

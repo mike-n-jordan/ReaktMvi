@@ -14,7 +14,7 @@ typealias Bootstrapper<State, Event> = (State) -> Observable<Event>
 
 data class StoreConfig<State, Event : Any, News>(
     val initialState: State,
-    val actions: Map<KClass<out Event>, MviAction<State, Event, out Event, News>>,
+    val events: Map<KClass<out Event>, MviAction<State, Event, out Event, News>>,
     val postActions: List<PostProcessor<State, Event, Event>>,
     val bootstrappers: List<Bootstrapper<State, Event>>,
     val statePublisher: BehaviorSubject<State> = behaviorSubject(initialState),

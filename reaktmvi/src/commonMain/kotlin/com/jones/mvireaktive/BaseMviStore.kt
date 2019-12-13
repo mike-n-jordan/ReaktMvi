@@ -49,7 +49,7 @@ open class BaseMviStore<State, Event : Any, News>(
     }
 
     private fun processInput(event: Event): Observable<Event> {
-        val config = config.actions[event::class] as MviAction<State, Event, Event, News>?
+        val config = config.events[event::class] as MviAction<State, Event, Event, News>?
             ?: throw IllegalArgumentException("Unregistered class: ${event::class}")
         val shouldHandle = config.filter?.invoke(state, event) ?: true
         return if (shouldHandle) executeEvent(state, event, config) else observableOfEmpty()

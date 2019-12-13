@@ -2,23 +2,23 @@ package com.jones.mvireaktive
 
 import com.badoo.reaktive.observable.asObservable
 import com.badoo.reaktive.observable.observableOf
-import com.jones.mvireaktive.middleware.MviActionBuilder
+import com.jones.mvireaktive.middleware.MviEventBuilder
 import kotlin.reflect.KClass
 
 class StoreConfigBuilder<State, Event : Any, News> {
 
     internal val actions =
-        mutableMapOf<KClass<out Event>, MviActionBuilder<State, Event, out Event, News>>()
+        mutableMapOf<KClass<out Event>, MviEventBuilder<State, Event, out Event, News>>()
     internal val postActions = mutableListOf<PostProcessor<State, Event, Event>>()
     internal val bootstrappers = mutableListOf<Bootstrapper<State, Event>>()
 
     inline fun <reified T : Event> on() = onClass(T::class)
 
-    fun <T : Event> onClass(clazz: KClass<T>): MviActionBuilder<State, Event, T, News> {
+    fun <T : Event> onClass(clazz: KClass<T>): MviEventBuilder<State, Event, T, News> {
         if (actions.contains(clazz)) {
             throw RuntimeException("Class: $clazz is already registered")
         }
-        return MviActionBuilder<State, Event, T, News>(clazz)
+        return MviEventBuilder<State, Event, T, News>(clazz)
             .also { actions[clazz] = it }
     }
 

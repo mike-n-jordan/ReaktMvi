@@ -30,7 +30,7 @@ object MiddlewareConfig {
     }
 
     private fun <State, Input: Any, BoundInput : Input, Output>
-            MviActionBuilder<State, Input, BoundInput, Output>.createAction() =
+            MviEventBuilder<State, Input, BoundInput, Output>.createAction() =
         MviAction(
             filter = filter,
             action = action,
@@ -46,7 +46,7 @@ object MiddlewareConfig {
     ): StoreConfig<State, Input, Output> =
         StoreConfig(
             initialState = initialState,
-            actions = actions.mapValues { it.value.createAction() },
+            events = actions.mapValues { it.value.createAction() },
             postActions = postActions,
             bootstrappers = bootstrappers,
             key = key,

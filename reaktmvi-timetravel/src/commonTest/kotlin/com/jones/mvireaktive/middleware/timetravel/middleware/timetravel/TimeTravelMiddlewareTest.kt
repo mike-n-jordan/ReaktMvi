@@ -17,33 +17,4 @@ class TimeTravelMiddlewareTest {
         MiddlewareConfig.clearMiddleware()
         MiddlewareConfig.registerGlobalMiddleware(timeTravelMiddleware)
     }
-
-    @Test
-    fun `test`() {
-        val store = DummyStoreOne()
-
-        store.onNext(Any())
-        val observer = store.test().also { it.reset() }
-        store.dispose()
-
-
-    }
-
-    private class DummyStoreOne(
-    ) : BaseMviStore<Any, Any, Any>(
-        Any(),
-        {
-            on<Any>()
-                .reduce { any, any2 -> Any() }
-        }
-    )
-
-    private class DummyStoreTwo(
-    ) : BaseMviStore<Any, Any, Any>(
-        Any(),
-        {
-            on<Any>()
-                .reduce { any, any2 -> Any() }
-        }
-    )
 }
