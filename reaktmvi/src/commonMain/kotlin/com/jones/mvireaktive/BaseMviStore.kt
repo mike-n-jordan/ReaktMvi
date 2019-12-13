@@ -16,7 +16,7 @@ open class BaseMviStore<State, Event : Any, News>(
     localMiddleware: List<Middleware> = emptyList()
 ) : MviStore<State, Event, News> {
 
-    internal val config: StoreConfig<State, Event, News> =
+    private val config: StoreConfig<State, Event, News> =
         StoreConfigBuilder<State, Event, News>()
             .apply { storeBuilder.invoke(this) }
             .createStoreConfig(
