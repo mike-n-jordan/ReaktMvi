@@ -2,7 +2,7 @@ package com.jones.mvireaktive.middleware.timetravel
 
 import com.badoo.reaktive.observable.observableOf
 import com.badoo.reaktive.observable.observableOfEmpty
-import com.jones.mvireaktive.AbstractMviStore
+import com.jones.mvireaktive.BaseMviStore
 import com.jones.mvireaktive.StoreConfig
 import com.jones.mvireaktive.StoreConfigBuilder
 import com.jones.mvireaktive.middleware.timetravel.TimeTravelMiddleware.TimeTravelInputRelay
@@ -37,7 +37,7 @@ sealed class News {
     internal class ResetStore(val stores: List<StoreConfig<Any, *, *>>) : News()
 }
 
-class TimeTravelStore : AbstractMviStore<State, TimeTravelWish, News>(
+class TimeTravelStore : BaseMviStore<State, TimeTravelWish, News>(
     initialState = State(),
     storeBuilder = {
         wireRegisterEvents()

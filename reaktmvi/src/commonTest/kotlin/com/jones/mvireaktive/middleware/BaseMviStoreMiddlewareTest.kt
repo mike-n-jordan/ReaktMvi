@@ -6,7 +6,7 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class AbstractMviStoreMiddlewareTest {
+class BaseMviStoreMiddlewareTest {
 
     @AfterTest
     fun cleanup() {

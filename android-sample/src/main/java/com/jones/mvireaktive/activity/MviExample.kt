@@ -3,7 +3,7 @@ package com.jones.mvireaktive.activity
 import com.badoo.reaktive.observable.delay
 import com.badoo.reaktive.observable.observableOf
 import com.badoo.reaktive.scheduler.mainScheduler
-import com.jones.mvireaktive.AbstractMviStore
+import com.jones.mvireaktive.BaseMviStore
 import com.jones.mvireaktive.StoreConfigBuilder
 
 data class State(
@@ -29,7 +29,7 @@ sealed class News {
     object SlowRemoveOneSuccess : News()
 }
 
-class MviExample() : AbstractMviStore<State, ExampleWish, News>(
+class MviExample() : BaseMviStore<State, ExampleWish, News>(
     initialState = State(),
     storeBuilder = {
         registerInit()

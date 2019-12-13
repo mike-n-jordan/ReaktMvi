@@ -2,7 +2,7 @@ package com.jones.mvireaktive.middleware
 
 import com.badoo.reaktive.scheduler.Scheduler
 import com.badoo.reaktive.scheduler.trampolineScheduler
-import com.jones.mvireaktive.AbstractMviStore
+import com.jones.mvireaktive.BaseMviStore
 import com.jones.mvireaktive.StoreConfigBuilder
 
 
@@ -19,7 +19,7 @@ fun createMviStore(
     middleware: List<Middleware> = emptyList(),
     builder: StoreConfigBuilder<State, Event, Nothing>.() -> Unit
 ) =
-    object : AbstractMviStore<State, Event, Nothing>(
+    object : BaseMviStore<State, Event, Nothing>(
         initialState = State(),
         storeBuilder = builder,
         internalScheduler = testScheduler,

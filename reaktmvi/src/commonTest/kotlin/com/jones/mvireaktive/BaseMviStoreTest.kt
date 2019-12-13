@@ -14,7 +14,7 @@ import com.jones.mvireaktive.middleware.createMviStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class AbstractMviStoreTest {
+class BaseMviStoreTest {
 
     @Test
     fun `when first subscribing to state, emit current state`() {

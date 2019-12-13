@@ -9,7 +9,7 @@ import com.jones.mvireaktive.middleware.MiddlewareConfig
 import com.jones.mvireaktive.middleware.MiddlewareConfig.createStoreConfig
 import com.jones.mvireaktive.middleware.MviAction
 
-open class AbstractMviStore<State, Event : Any, News>(
+open class BaseMviStore<State, Event : Any, News>(
     initialState: State,
     storeBuilder: StoreConfigBuilder<State, Event, News>.() -> Unit,
     internalScheduler: Scheduler = MiddlewareConfig.defaultInternalScheduler,
