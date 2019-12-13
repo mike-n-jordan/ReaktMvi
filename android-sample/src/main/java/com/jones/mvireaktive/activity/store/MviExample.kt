@@ -18,10 +18,8 @@ interface ExampleWish {
 }
 
 private object Reset : ExampleWish
-private class SlowRemoveOneReceived(val success: Boolean) :
-    ExampleWish
-private class SlowAddOneReceived(val success: Boolean) :
-    ExampleWish
+private class SlowRemoveOneReceived(val success: Boolean) : ExampleWish
+private class SlowAddOneReceived(val success: Boolean) : ExampleWish
 
 class MviExample : BaseMviStore<ExampleState, ExampleWish, News>(
     initialState = ExampleState(),
