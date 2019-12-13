@@ -10,9 +10,10 @@ import com.badoo.reaktive.disposable.plusAssign
 import com.badoo.reaktive.observable.observeOn
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.scheduler.mainScheduler
+import com.jones.mvireaktive.activity.store.ExampleWish.Wish
+import com.jones.mvireaktive.activity.store.MviExample
 import com.jones.mvireaktive.middleware.MiddlewareConfig
 import com.jones.mvireaktive.middleware.timetravel.TimeTravelMiddleware
-import com.jones.mvireaktive.middleware.timetravel.TimeTravelWish
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,16 +31,16 @@ class MainActivity : AppCompatActivity() {
         counter = findViewById(R.id.counter_value)
 
         findViewById<View>(R.id.add_one).setOnClickListener {
-            mviStore.onNext(ExampleWish.AddOne)
+            mviStore.onNext(Wish.AddOne)
         }
         findViewById<View>(R.id.add_one_slow).setOnClickListener {
-            mviStore.onNext(ExampleWish.SlowAddOne)
+            mviStore.onNext(Wish.SlowAddOne)
         }
         findViewById<View>(R.id.remove_one).setOnClickListener {
-            mviStore.onNext(ExampleWish.RemoveOne)
+            mviStore.onNext(Wish.RemoveOne)
         }
         findViewById<View>(R.id.remove_one_slow).setOnClickListener {
-            mviStore.onNext(ExampleWish.SlowRemoveOne)
+            mviStore.onNext(Wish.SlowRemoveOne)
         }
         findViewById<View>(R.id.start_playback).setOnClickListener {
             timeTravel.startPlayback()
