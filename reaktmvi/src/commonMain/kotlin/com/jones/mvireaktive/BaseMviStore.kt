@@ -7,7 +7,6 @@ import com.badoo.reaktive.scheduler.Scheduler
 import com.jones.mvireaktive.middleware.Middleware
 import com.jones.mvireaktive.middleware.MiddlewareConfig
 import com.jones.mvireaktive.middleware.MiddlewareConfig.createStoreConfig
-import com.jones.mvireaktive.middleware.MviAction
 
 open class BaseMviStore<State, Event : Any, News>(
     initialState: State,

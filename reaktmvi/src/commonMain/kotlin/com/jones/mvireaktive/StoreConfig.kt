@@ -6,7 +6,6 @@ import com.badoo.reaktive.subject.behavior.BehaviorSubject
 import com.badoo.reaktive.subject.behavior.behaviorSubject
 import com.badoo.reaktive.subject.publish.publishSubject
 import com.jones.mvireaktive.middleware.Middleware
-import com.jones.mvireaktive.middleware.MviAction
 import kotlin.reflect.KClass
 
 typealias PostProcessor<State, InputEvent, OutputEvent> = (State, InputEvent) -> OutputEvent?

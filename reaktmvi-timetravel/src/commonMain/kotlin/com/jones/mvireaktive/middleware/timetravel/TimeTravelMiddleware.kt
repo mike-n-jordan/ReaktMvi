@@ -8,9 +8,9 @@ import com.badoo.reaktive.subject.Relay
 import com.jones.mvireaktive.PostProcessor
 import com.jones.mvireaktive.StoreConfig
 import com.jones.mvireaktive.middleware.Middleware
-import com.jones.mvireaktive.middleware.MviAction
+import com.jones.mvireaktive.MviAction
 
-class TimeTravelMiddleware() : Middleware {
+class TimeTravelMiddleware : Middleware {
 
     private val disposable = CompositeDisposable()
     internal val timeTravelStore = TimeTravelStore()

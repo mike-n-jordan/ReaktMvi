@@ -1,7 +1,6 @@
-package com.jones.mvireaktive.middleware
+package com.jones.mvireaktive
 
 import com.badoo.reaktive.observable.Observable
-import com.jones.mvireaktive.PostProcessor
 
 typealias Reducer<State, BoundEvent> = (State, BoundEvent) -> State
 typealias Filter<State, BoundEvent> = (State, BoundEvent) -> Boolean

@@ -21,6 +21,8 @@ private object Reset : ExampleWish
 private class SlowRemoveOneReceived(val success: Boolean) : ExampleWish
 private class SlowAddOneReceived(val success: Boolean) : ExampleWish
 
+typealias ExampleBuilder = StoreConfigBuilder<ExampleState, ExampleWish, News>
+
 class MviExample : BaseMviStore<ExampleState, ExampleWish, News>(
     initialState = ExampleState(),
     storeBuilder = {
@@ -52,12 +54,12 @@ class MviExample : BaseMviStore<ExampleState, ExampleWish, News>(
     }
 )
 
-private fun StoreConfigBuilder<ExampleState, ExampleWish, News>.registerInit() {
+private fun ExampleBuilder.registerInit() {
     bootstrapWith(Wish.SlowAddOne)
     bootstrap { state -> observableOf(Wish.AddOne, Wish.AddOne) }
 }
 
-private fun StoreConfigBuilder<ExampleState, ExampleWish, News>.registerResetEvents() {
+private fun ExampleBuilder.registerResetEvents() {
     on<Reset>()
         .reduce { state, event -> ExampleState() }
         .news { state, event -> News.ResetEvent }
@@ -79,7 +81,7 @@ private fun StoreConfigBuilder<ExampleState, ExampleWish, News>.registerResetEve
     postEvent<Wish.RemoveOne> { state, removeOne -> if (state.count < -5) Reset else null }
 }
 
-private fun StoreConfigBuilder<ExampleState, ExampleWish, News>.registerRemoveEvents() {
+private fun ExampleBuilder.registerRemoveEvents() {
     on<Wish.RemoveOne>()
         .reduce { state, event -> state.copy(count = state.count - 1) }
 
