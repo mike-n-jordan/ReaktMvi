@@ -5,26 +5,15 @@ import com.badoo.reaktive.observable.observableOf
 import com.badoo.reaktive.scheduler.mainScheduler
 import com.jones.mvireaktive.BaseMviStore
 import com.jones.mvireaktive.StoreConfigBuilder
-import com.jones.mvireaktive.activity.store.ExampleWish.Wish
 
-interface ExampleWish {
+private object Reset : MviCounterWish
+private class SlowRemoveOneReceived(val success: Boolean) : MviCounterWish
+private class SlowAddOneReceived(val success: Boolean) : MviCounterWish
 
-    sealed class Wish : ExampleWish {
-        object AddOne : Wish()
-        object RemoveOne : Wish()
-        object SlowAddOne : Wish()
-        object SlowRemoveOne : Wish()
-    }
-}
+typealias MviCounterBuilder = StoreConfigBuilder<MviCounterState, MviCounterWish, News>
 
-private object Reset : ExampleWish
-private class SlowRemoveOneReceived(val success: Boolean) : ExampleWish
-private class SlowAddOneReceived(val success: Boolean) : ExampleWish
-
-typealias ExampleBuilder = StoreConfigBuilder<ExampleState, ExampleWish, News>
-
-class MviExample : BaseMviStore<ExampleState, ExampleWish, News>(
-    initialState = ExampleState(),
+class MviCounterStore : BaseMviStore<MviCounterState, MviCounterWish, News>(
+    initialState = MviCounterState(),
     storeBuilder = {
         registerInit()
         registerResetEvents()
@@ -33,39 +22,32 @@ class MviExample : BaseMviStore<ExampleState, ExampleWish, News>(
     }
 )
 
-private fun ExampleBuilder.registerInit() {
-    bootstrapWith(Wish.SlowAddOne)
-    bootstrap { state -> observableOf(Wish.AddOne, Wish.AddOne) }
+private fun MviCounterBuilder.registerInit() {
+    bootstrapWith(MviCounterWish.SlowAddOne)
+    bootstrap { state -> observableOf(MviCounterWish.AddOne, MviCounterWish.AddOne) }
 }
 
-private fun ExampleBuilder.registerResetEvents() {
+private fun MviCounterBuilder.registerResetEvents() {
     on<Reset>()
-        .reducer { state, event -> ExampleState() }
+        .reducer { state, event -> MviCounterState() }
         .newsPublisher { state, event -> News.ResetEvent }
 
     post { state, event ->
         when (event) {
-            is Wish -> when (event) {
-                Wish.AddOne -> if (state.count > 9) Reset else null
-                Wish.RemoveOne,
-                Wish.SlowAddOne,
-                Wish.SlowRemoveOne -> null
-            }
-            is Reset,
-            is SlowRemoveOneReceived,
-            is SlowAddOneReceived -> null
+            is MviCounterWish.AddOne -> if (state.count > 9) Reset else null
+            is MviCounterWish.RemoveOne -> if (state.count < -5) Reset else null
             else -> null
         }
     }
-    postEvent<Wish.RemoveOne> { state, removeOne -> if (state.count < -5) Reset else null }
 }
 
-private fun ExampleBuilder.registerRemoveEvents() {
-    on<Wish.RemoveOne>()
+private fun MviCounterBuilder.registerRemoveEvents() {
+    on<MviCounterWish.RemoveOne>()
         .filter { exampleState, removeOne -> true }
+        .reducer { state, removeOne -> state.copy(count = state.count - 1) }
         .newsPublisher { exampleState, removeOne -> null }
 
-    on<Wish.SlowRemoveOne>()
+    on<MviCounterWish.SlowRemoveOne>()
         .filter { state, event ->
             !state.loadingSlowRemove
         }
@@ -79,7 +61,6 @@ private fun ExampleBuilder.registerRemoveEvents() {
                 )
             ).delay(2_000, mainScheduler)
         }
-
     on<SlowRemoveOneReceived>()
         .reducer { state, event ->
             val count = if (event.success) state.count - 1 else state.count
@@ -90,10 +71,11 @@ private fun ExampleBuilder.registerRemoveEvents() {
         }
 }
 
-private fun ExampleBuilder.registerAddEvents() {
-    on<Wish.AddOne>()
+private fun MviCounterBuilder.registerAddEvents() {
+    on<MviCounterWish.AddOne>()
         .reducer { state, event -> state.copy(count = state.count + 1) }
-    on<Wish.SlowAddOne>()
+
+    on<MviCounterWish.SlowAddOne>()
         .filter { state, event -> !state.loadingSlowAdd }
         .reducer { state, event -> state.copy(loadingSlowAdd = true) }
         .actor { state, event ->
@@ -110,5 +92,5 @@ private fun ExampleBuilder.registerAddEvents() {
             state.copy(count = count, loadingSlowAdd = false)
         }
         .newsPublisher { state, slowAdd -> if (slowAdd.success) News.SlowAddOneSuccess else null }
-        .postEventPublisher { state, slowAdd -> Wish.AddOne }
+        .postEventPublisher { state, slowAdd -> MviCounterWish.AddOne }
 }

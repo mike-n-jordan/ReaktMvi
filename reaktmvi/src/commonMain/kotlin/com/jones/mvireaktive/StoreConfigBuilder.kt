@@ -24,10 +24,6 @@ class StoreConfigBuilder<State, Event : Any, News> {
         ).also { actions[clazz] = it }
     }
 
-    inline fun <reified T : Event> postEvent(crossinline onPost: PostProcessor<State, T, Event>) {
-        post { state, event -> if (event is T) onPost(state, event) else null }
-    }
-
     fun post(post: PostProcessor<State, Event, Event>) {
         postActions.add(post)
     }

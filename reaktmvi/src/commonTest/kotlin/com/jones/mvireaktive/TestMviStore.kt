@@ -1,9 +1,8 @@
-package com.jones.mvireaktive.middleware
+package com.jones.mvireaktive
 
 import com.badoo.reaktive.scheduler.Scheduler
 import com.badoo.reaktive.scheduler.trampolineScheduler
-import com.jones.mvireaktive.BaseMviStore
-import com.jones.mvireaktive.StoreConfigBuilder
+import com.jones.mvireaktive.middleware.Middleware
 
 
 data class State(val count: Int = 0, val slowAddCount: Int = 0)

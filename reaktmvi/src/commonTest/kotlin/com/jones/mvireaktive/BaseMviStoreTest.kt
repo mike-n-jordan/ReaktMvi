@@ -8,9 +8,6 @@ import com.badoo.reaktive.test.observable.assertValue
 import com.badoo.reaktive.test.observable.assertValues
 import com.badoo.reaktive.test.observable.test
 import com.badoo.reaktive.test.scheduler.TestScheduler
-import com.jones.mvireaktive.middleware.Event
-import com.jones.mvireaktive.middleware.State
-import com.jones.mvireaktive.middleware.createMviStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -159,9 +156,9 @@ class BaseMviStoreTest {
     fun `when event specific post processor is set, then it fires for event`() {
         val store = createMviStore {
             on<Event.SlowAddOne>()
+                .postEventPublisher { state, event -> Event.AddOne }
             on<Event.AddOne>()
                 .reducer { state, addOne -> state.copy(count = state.count + 1) }
-            postEvent<Event.SlowAddOne> { state, event -> Event.AddOne }
         }
         val observer = store.test().also { it.reset() }
 
@@ -174,10 +171,10 @@ class BaseMviStoreTest {
     fun `when event specific post processor is set, then it isn't fired for other events`() {
         val store = createMviStore {
             on<Event.SlowAddOne>()
+                .postEventPublisher { state, event -> Event.AddOne }
             on<Event.Other>()
             on<Event.AddOne>()
                 .reducer { state, addOne -> state.copy(count = state.count + 1) }
-            postEvent<Event.SlowAddOne> { state, event -> Event.AddOne }
         }
         val observer = store.test().also { it.reset() }
 

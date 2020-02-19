@@ -2,6 +2,8 @@ package com.jones.mvireaktive.middleware
 
 import com.badoo.reaktive.test.observable.assertValue
 import com.badoo.reaktive.test.observable.test
+import com.jones.mvireaktive.Event
+import com.jones.mvireaktive.createMviStore
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertTrue

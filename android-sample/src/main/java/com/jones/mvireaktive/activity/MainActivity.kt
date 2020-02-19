@@ -10,14 +10,14 @@ import com.badoo.reaktive.disposable.plusAssign
 import com.badoo.reaktive.observable.observeOn
 import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.scheduler.mainScheduler
-import com.jones.mvireaktive.activity.store.ExampleWish.Wish
-import com.jones.mvireaktive.activity.store.MviExample
+import com.jones.mvireaktive.activity.store.MviCounterStore
+import com.jones.mvireaktive.activity.store.MviCounterWish
 import com.jones.mvireaktive.middleware.MiddlewareConfig
 import com.jones.mvireaktive.middleware.timetravel.TimeTravelMiddleware
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mviStore: MviExample
+    private lateinit var mviStore: MviCounterStore
     private val disposable: CompositeDisposable = CompositeDisposable()
     private lateinit var counter: TextView
 
@@ -27,20 +27,20 @@ class MainActivity : AppCompatActivity() {
         val timeTravel = TimeTravelMiddleware()
         MiddlewareConfig.registerGlobalMiddleware(timeTravel)
 
-        mviStore = MviExample()
+        mviStore = MviCounterStore()
         counter = findViewById(R.id.counter_value)
 
         findViewById<View>(R.id.add_one).setOnClickListener {
-            mviStore.onNext(Wish.AddOne)
+            mviStore.onNext(MviCounterWish.AddOne)
         }
         findViewById<View>(R.id.add_one_slow).setOnClickListener {
-            mviStore.onNext(Wish.SlowAddOne)
+            mviStore.onNext(MviCounterWish.SlowAddOne)
         }
         findViewById<View>(R.id.remove_one).setOnClickListener {
-            mviStore.onNext(Wish.RemoveOne)
+            mviStore.onNext(MviCounterWish.RemoveOne)
         }
         findViewById<View>(R.id.remove_one_slow).setOnClickListener {
-            mviStore.onNext(Wish.SlowRemoveOne)
+            mviStore.onNext(MviCounterWish.SlowRemoveOne)
         }
         findViewById<View>(R.id.start_playback).setOnClickListener {
             timeTravel.startPlayback()
