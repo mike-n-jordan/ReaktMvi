@@ -40,8 +40,8 @@ private fun ExampleBuilder.registerInit() {
 
 private fun ExampleBuilder.registerResetEvents() {
     on<Reset>()
-        .reduce { state, event -> ExampleState() }
-        .news { state, event -> News.ResetEvent }
+        .reducer { state, event -> ExampleState() }
+        .newsPublisher { state, event -> News.ResetEvent }
 
     post { state, event ->
         when (event) {
@@ -63,16 +63,16 @@ private fun ExampleBuilder.registerResetEvents() {
 private fun ExampleBuilder.registerRemoveEvents() {
     on<Wish.RemoveOne>()
         .filter { exampleState, removeOne -> true }
-        .news { exampleState, removeOne -> null }
+        .newsPublisher { exampleState, removeOne -> null }
 
     on<Wish.SlowRemoveOne>()
         .filter { state, event ->
             !state.loadingSlowRemove
         }
-        .reduce { state, event ->
+        .reducer { state, event ->
             state.copy(loadingSlowRemove = true)
         }
-        .action { state, event ->
+        .actor { state, event ->
             observableOf(
                 SlowRemoveOneReceived(
                     success = true
@@ -81,22 +81,22 @@ private fun ExampleBuilder.registerRemoveEvents() {
         }
 
     on<SlowRemoveOneReceived>()
-        .reduce { state, event ->
+        .reducer { state, event ->
             val count = if (event.success) state.count - 1 else state.count
             state.copy(count = count, loadingSlowRemove = false)
         }
-        .news { state, slowRemoved ->
+        .newsPublisher { state, slowRemoved ->
             if (slowRemoved.success) News.SlowRemoveOneSuccess else null
         }
 }
 
 private fun ExampleBuilder.registerAddEvents() {
     on<Wish.AddOne>()
-        .reduce { state, event -> state.copy(count = state.count + 1) }
+        .reducer { state, event -> state.copy(count = state.count + 1) }
     on<Wish.SlowAddOne>()
         .filter { state, event -> !state.loadingSlowAdd }
-        .reduce { state, event -> state.copy(loadingSlowAdd = true) }
-        .action { state, event ->
+        .reducer { state, event -> state.copy(loadingSlowAdd = true) }
+        .actor { state, event ->
             observableOf(
                 SlowAddOneReceived(
                     success = true
@@ -105,10 +105,10 @@ private fun ExampleBuilder.registerAddEvents() {
                 .delay(2_000, mainScheduler)
         }
     on<SlowAddOneReceived>()
-        .reduce { state, event ->
+        .reducer { state, event ->
             val count = if (event.success) state.count + 1 else state.count
             state.copy(count = count, loadingSlowAdd = false)
         }
-        .news { state, slowAdd -> if (slowAdd.success) News.SlowAddOneSuccess else null }
-        .post { state, slowAdd -> Wish.AddOne }
+        .newsPublisher { state, slowAdd -> if (slowAdd.success) News.SlowAddOneSuccess else null }
+        .postEventPublisher { state, slowAdd -> Wish.AddOne }
 }

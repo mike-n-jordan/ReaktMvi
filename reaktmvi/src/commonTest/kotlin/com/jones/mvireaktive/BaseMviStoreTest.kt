@@ -29,7 +29,7 @@ class BaseMviStoreTest {
     fun `when an unregistered event is passed to the store, then throw an exception`() {
         val store = createMviStore {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
         }
 
         val observer = store.test()
@@ -42,7 +42,7 @@ class BaseMviStoreTest {
     fun `when store is disposed, stop accepting input`() {
         val store = createMviStore {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
         }
 
         val observer = store.test().also { it.reset() }
@@ -57,7 +57,7 @@ class BaseMviStoreTest {
         val testScheduler = TestScheduler(isManualProcessing = true)
         val store = createMviStore(testScheduler) {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
         }
         val observer = store.test().also { it.reset() }
 
@@ -73,8 +73,8 @@ class BaseMviStoreTest {
         val store = createMviStore {
             on<Event.AddOne>()
                 .filter { state, addOne -> false }
-                .reduce { state, addOne -> throw RuntimeException() }
-                .action { state, addOne -> throw RuntimeException() }
+                .reducer { state, addOne -> throw RuntimeException() }
+                .actor { state, addOne -> throw RuntimeException() }
             post { state, event -> throw RuntimeException() }
         }
         val observer = store.test().also { it.reset() }
@@ -89,7 +89,7 @@ class BaseMviStoreTest {
         val store = createMviStore {
             on<Event.AddOne>()
                 .filter { state, addOne -> true }
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
         }
         val observer = store.test().also { it.reset() }
 
@@ -102,10 +102,10 @@ class BaseMviStoreTest {
     fun `when a wish has an associated action, then perform the action`() {
         val store = createMviStore {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             on<Event.SlowAddOne>()
-                .reduce { state, slowAddOne -> state.copy(slowAddCount = state.slowAddCount + 1) }
-                .action { state, slowAddOne -> observableOf(Event.AddOne) }
+                .reducer { state, slowAddOne -> state.copy(slowAddCount = state.slowAddCount + 1) }
+                .actor { state, slowAddOne -> observableOf(Event.AddOne) }
         }
         val observer = store.test().also { it.reset() }
 
@@ -119,10 +119,10 @@ class BaseMviStoreTest {
         val eventPublisher = publishSubject<Event.AddOne>()
         val store = createMviStore {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             on<Event.SlowAddOne>()
-                .reduce { state, slowAddOne -> state.copy(slowAddCount = state.slowAddCount + 1) }
-                .action { state, slowAddOne -> eventPublisher }
+                .reducer { state, slowAddOne -> state.copy(slowAddCount = state.slowAddCount + 1) }
+                .actor { state, slowAddOne -> eventPublisher }
         }
         val observer = store.test().also { it.reset() }
 
@@ -137,10 +137,10 @@ class BaseMviStoreTest {
         val eventPublisher = publishSubject<Event.AddOne>()
         val store = createMviStore {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             on<Event.SlowAddOne>()
-                .reduce { state, slowAddOne -> state.copy(slowAddCount = state.slowAddCount + 1) }
-                .action { state, slowAddOne -> eventPublisher }
+                .reducer { state, slowAddOne -> state.copy(slowAddCount = state.slowAddCount + 1) }
+                .actor { state, slowAddOne -> eventPublisher }
         }
         val observer = store.test().also { it.reset() }
 
@@ -160,7 +160,7 @@ class BaseMviStoreTest {
         val store = createMviStore {
             on<Event.SlowAddOne>()
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             postEvent<Event.SlowAddOne> { state, event -> Event.AddOne }
         }
         val observer = store.test().also { it.reset() }
@@ -176,7 +176,7 @@ class BaseMviStoreTest {
             on<Event.SlowAddOne>()
             on<Event.Other>()
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             postEvent<Event.SlowAddOne> { state, event -> Event.AddOne }
         }
         val observer = store.test().also { it.reset() }
@@ -191,7 +191,7 @@ class BaseMviStoreTest {
         val store = createMviStore {
             on<Event.Other>()
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             post { state, event -> Event.AddOne }
         }
 
@@ -205,9 +205,9 @@ class BaseMviStoreTest {
     fun `when builder post event is set, then it is fired for bound event`() {
         val store = createMviStore {
             on<Event.Other>()
-                .post { state, other -> Event.AddOne }
+                .postEventPublisher { state, other -> Event.AddOne }
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             on<Event.SlowAddOne>()
         }
         val observer = store.test().also { it.reset() }
@@ -225,9 +225,9 @@ class BaseMviStoreTest {
     fun `when builder post event is set, then it isn't fired for all events`() {
         val store = createMviStore {
             on<Event.Other>()
-                .post { state, other -> Event.AddOne }
+                .postEventPublisher { state, other -> Event.AddOne }
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             on<Event.SlowAddOne>()
         }
         val observer = store.test().also { it.reset() }
@@ -241,7 +241,7 @@ class BaseMviStoreTest {
     fun `when bootstrapper is provided with a single event, fulfill action`() {
         val store = createMviStore {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             bootstrapWith(Event.AddOne)
         }
 
@@ -254,7 +254,7 @@ class BaseMviStoreTest {
     fun `when bootstrapper is set via observable, then fulfill action`() {
         val store = createMviStore {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             bootstrap { observableOf(Event.AddOne, Event.AddOne) }
         }
 
@@ -267,7 +267,7 @@ class BaseMviStoreTest {
     fun `when multiple bootstrappers are set, then fulfill all actions`() {
         val store = createMviStore {
             on<Event.AddOne>()
-                .reduce { state, addOne -> state.copy(count = state.count + 1) }
+                .reducer { state, addOne -> state.copy(count = state.count + 1) }
             bootstrap { observableOf(Event.AddOne, Event.AddOne) }
             bootstrapWith(Event.AddOne)
             bootstrapWith(listOf(Event.AddOne, Event.AddOne))

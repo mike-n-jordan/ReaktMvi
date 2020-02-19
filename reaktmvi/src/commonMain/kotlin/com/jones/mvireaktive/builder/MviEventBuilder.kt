@@ -19,22 +19,22 @@ class MviEventBuilder<State, Event : Any, BoundEvent : Event, NewsEvent>(
         return this
     }
 
-    override fun reduce(reducer: Reducer<State, BoundEvent>?): ActionEventBuilder<State, Event, BoundEvent, NewsEvent> {
-        this.reducer = reducer
+    override fun reducer(reduce: Reducer<State, BoundEvent>?): ActionEventBuilder<State, Event, BoundEvent, NewsEvent> {
+        this.reducer = reduce
         return this
     }
 
-    override fun action(action: Action<State, BoundEvent, Event>?): NewsEventBuilder<State, Event, BoundEvent, NewsEvent> {
+    override fun actor(action: Action<State, BoundEvent, Event>?): NewsEventBuilder<State, Event, BoundEvent, NewsEvent> {
         this.action = action
         return this
     }
 
-    override fun news(news: NewsProcessor<State, BoundEvent, NewsEvent>?): PostEventBuilder<State, Event, BoundEvent, NewsEvent> {
+    override fun newsPublisher(news: NewsProcessor<State, BoundEvent, NewsEvent>?): PostEventBuilder<State, Event, BoundEvent, NewsEvent> {
         this.news = news
         return this
     }
 
-    override fun post(postEvent: PostProcessor<State, BoundEvent, Event>?): FinishedEventBuilder {
+    override fun postEventPublisher(postEvent: PostProcessor<State, BoundEvent, Event>?): FinishedEventBuilder {
         if (postEvent != null) {
             this.post = { state, event ->
                 if (eventClass.isInstance(event)) postEvent(
