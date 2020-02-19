@@ -28,28 +28,7 @@ class MviExample : BaseMviStore<ExampleState, ExampleWish, News>(
     storeBuilder = {
         registerInit()
         registerResetEvents()
-
-        on<Wish.AddOne>()
-            .reduce { state, event -> state.copy(count = state.count + 1) }
-        on<Wish.SlowAddOne>()
-            .filter { state, event -> !state.loadingSlowAdd }
-            .action { state, event ->
-                observableOf(
-                    SlowAddOneReceived(
-                        success = true
-                    )
-                )
-                    .delay(2_000, mainScheduler)
-            }
-            .reduce { state, event -> state.copy(loadingSlowAdd = true) }
-        on<SlowAddOneReceived>()
-            .reduce { state, event ->
-                val count = if (event.success) state.count + 1 else state.count
-                state.copy(count = count, loadingSlowAdd = false)
-            }
-            .news { state, slowAdd -> if (slowAdd.success) News.SlowAddOneSuccess else null }
-            .post { state, slowAdd -> Wish.AddOne }
-
+        registerAddEvents()
         registerRemoveEvents()
     }
 )
@@ -83,19 +62,23 @@ private fun ExampleBuilder.registerResetEvents() {
 
 private fun ExampleBuilder.registerRemoveEvents() {
     on<Wish.RemoveOne>()
-        .reduce { state, event -> state.copy(count = state.count - 1) }
+        .filter { exampleState, removeOne -> true }
+        .news { exampleState, removeOne -> null }
 
     on<Wish.SlowRemoveOne>()
-        .filter { state, event -> !state.loadingSlowRemove }
+        .filter { state, event ->
+            !state.loadingSlowRemove
+        }
+        .reduce { state, event ->
+            state.copy(loadingSlowRemove = true)
+        }
         .action { state, event ->
             observableOf(
                 SlowRemoveOneReceived(
                     success = true
                 )
-            )
-                .delay(2_000, mainScheduler)
+            ).delay(2_000, mainScheduler)
         }
-        .reduce { state, event -> state.copy(loadingSlowRemove = true) }
 
     on<SlowRemoveOneReceived>()
         .reduce { state, event ->
@@ -105,4 +88,27 @@ private fun ExampleBuilder.registerRemoveEvents() {
         .news { state, slowRemoved ->
             if (slowRemoved.success) News.SlowRemoveOneSuccess else null
         }
+}
+
+private fun ExampleBuilder.registerAddEvents() {
+    on<Wish.AddOne>()
+        .reduce { state, event -> state.copy(count = state.count + 1) }
+    on<Wish.SlowAddOne>()
+        .filter { state, event -> !state.loadingSlowAdd }
+        .reduce { state, event -> state.copy(loadingSlowAdd = true) }
+        .action { state, event ->
+            observableOf(
+                SlowAddOneReceived(
+                    success = true
+                )
+            )
+                .delay(2_000, mainScheduler)
+        }
+    on<SlowAddOneReceived>()
+        .reduce { state, event ->
+            val count = if (event.success) state.count + 1 else state.count
+            state.copy(count = count, loadingSlowAdd = false)
+        }
+        .news { state, slowAdd -> if (slowAdd.success) News.SlowAddOneSuccess else null }
+        .post { state, slowAdd -> Wish.AddOne }
 }

@@ -3,7 +3,7 @@ package com.jones.mvireaktive.middleware
 import com.badoo.reaktive.scheduler.Scheduler
 import com.badoo.reaktive.scheduler.singleScheduler
 import com.jones.mvireaktive.MviAction
-import com.jones.mvireaktive.MviEventBuilder
+import com.jones.mvireaktive.builder.MviEventBuilder
 import com.jones.mvireaktive.StoreConfig
 import com.jones.mvireaktive.StoreConfigBuilder
 

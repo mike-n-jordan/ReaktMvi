@@ -2,6 +2,7 @@ package com.jones.mvireaktive
 
 import com.badoo.reaktive.observable.asObservable
 import com.badoo.reaktive.observable.observableOf
+import com.jones.mvireaktive.builder.MviEventBuilder
 import kotlin.reflect.KClass
 
 class StoreConfigBuilder<State, Event : Any, News> {
@@ -14,19 +15,13 @@ class StoreConfigBuilder<State, Event : Any, News> {
     inline fun <reified T : Event> on(): MviEventBuilder<State, Event, T, News> =
         onClass(T::class)
 
-    inline fun <reified T : Event> on(
-        noinline reducer: Reducer<State, Event>? = null
-    ): MviEventBuilder<State, Event, T, News> =
-        onClass(T::class).apply {
-            reduce(reducer)
-        }
-
     fun <T : Event> onClass(clazz: KClass<T>): MviEventBuilder<State, Event, T, News> {
         if (actions.contains(clazz)) {
             throw RuntimeException("Class: $clazz is already registered")
         }
-        return MviEventBuilder<State, Event, T, News>(clazz)
-            .also { actions[clazz] = it }
+        return MviEventBuilder<State, Event, T, News>(
+            clazz
+        ).also { actions[clazz] = it }
     }
 
     inline fun <reified T : Event> postEvent(crossinline onPost: PostProcessor<State, T, Event>) {
