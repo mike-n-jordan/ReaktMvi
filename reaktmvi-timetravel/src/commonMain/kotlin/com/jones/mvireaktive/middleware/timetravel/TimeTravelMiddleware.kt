@@ -16,6 +16,10 @@ class TimeTravelMiddleware : Middleware {
     internal val timeTravelStore = TimeTravelStore()
 
     init {
+        initListeningToPlaybackEvents()
+    }
+
+    private fun initListeningToPlaybackEvents() {
         disposable += timeTravelStore.news
             .subscribe {
                 when (it) {

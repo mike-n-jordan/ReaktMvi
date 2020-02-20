@@ -7,35 +7,18 @@ import com.jones.mvireaktive.StoreConfig
 import com.jones.mvireaktive.StoreConfigBuilder
 import com.jones.mvireaktive.middleware.timetravel.TimeTravelMiddleware.TimeTravelInputRelay
 
-data class State(
-    val isRecording: Boolean = true,
-    val isPlayingBack: Boolean = false,
-    val registeredRelays: Map<Any, TimeTravelInputRelay<Any>> = emptyMap(),
-    val registeredStores: List<StoreConfig<Any, Any, *>> = emptyList(),
-    val recordedEvents: List<Pair<Any, Any>> = emptyList(),
-    val nextEventIndex: Int = -1
-)
-
-sealed class TimeTravelWish {
-    object StartPlayback : TimeTravelWish()
-    object PlayNext : TimeTravelWish()
-}
-
-internal class RecordEvent<T : Any>(val key: Any, val event: T) : TimeTravelWish()
 internal class RegisterStore(
     val store: StoreConfig<Any, Any, *>,
     val relay: TimeTravelInputRelay<Any>
-) : TimeTravelWish()
-internal class UnregisterStore(val store: StoreConfig<*, *, *>) : TimeTravelWish()
-private class EmitEvent(val key: Any, val event: Any) : TimeTravelWish()
-private object StartRecording : TimeTravelWish()
-private object StopRecording : TimeTravelWish()
-private object StopPlayback : TimeTravelWish()
+) : TimeTravelWish
 
-sealed class News {
-    internal data class Playback(val relay: TimeTravelInputRelay<Any>, val event: Any) : News()
-    internal class ResetStore(val stores: List<StoreConfig<Any, *, *>>) : News()
-}
+internal class UnregisterStore(val store: StoreConfig<*, *, *>) : TimeTravelWish
+
+private object StartRecording : TimeTravelWish
+private object StopRecording : TimeTravelWish
+internal class RecordEvent<T : Any>(val key: Any, val event: T) : TimeTravelWish
+private class EmitEvent(val key: Any, val event: Any) : TimeTravelWish
+private object StopPlayback : TimeTravelWish
 
 class TimeTravelStore : BaseMviStore<State, TimeTravelWish, News>(
     initialState = State(),
@@ -61,7 +44,7 @@ private fun StoreConfigBuilder<State, TimeTravelWish, News>.wireRegisterEvents()
             state.copy(
                 registeredRelays = state.registeredRelays.minus(unregisterStore.store.key),
                 registeredStores = state.registeredStores
-                    .filter { it.key !== unregisterStore.store.key}
+                    .filter { it.key !== unregisterStore.store.key }
             )
         }
 }
@@ -116,7 +99,7 @@ private fun StoreConfigBuilder<State, TimeTravelWish, News>.wirePlaybackEvents()
             relay?.let { News.Playback(it, emitEvent.event) }
         }
         .postEventPublisher { state, emitEvent -> StopPlayback.takeIf { state.nextEventIndex >= state.recordedEvents.size } }
-    
+
     on<StopPlayback>()
         .filter { state, stopPlayback -> state.isPlayingBack }
         .reducer { state, stopPlayback ->
