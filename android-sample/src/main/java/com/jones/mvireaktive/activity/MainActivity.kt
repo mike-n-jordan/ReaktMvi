@@ -9,15 +9,15 @@ import com.badoo.reaktive.disposable.scope.DisposableScope
 import com.badoo.reaktive.disposable.scope.disposableScope
 import com.badoo.reaktive.observable.observeOn
 import com.badoo.reaktive.scheduler.mainScheduler
-import com.jones.mvireaktive.activity.store.ExampleWish.Wish
-import com.jones.mvireaktive.activity.store.MviExample
+import com.jones.mvireaktive.activity.store.MviCounterStore
+import com.jones.mvireaktive.activity.store.MviCounterWish
 import com.jones.mvireaktive.middleware.MiddlewareConfig
 import com.jones.mvireaktive.middleware.timetravel.TimeTravelMiddleware
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class MainActivity : AppCompatActivity(), DisposableScope by DisposableScope() {
 
-    private lateinit var mviStore: MviExample
+    private lateinit var mviStore: MviCounterStore
     private var startStopScope: DisposableScope? = null
     private lateinit var counter: TextView
 
@@ -27,20 +27,20 @@ class MainActivity : AppCompatActivity(), DisposableScope by DisposableScope() {
         val timeTravel = TimeTravelMiddleware()
         MiddlewareConfig.registerGlobalMiddleware(timeTravel)
 
-        mviStore = MviExample().scope()
+        mviStore = MviCounterStore().scope()
         counter = findViewById(R.id.counter_value)
 
         findViewById<View>(R.id.add_one).setOnClickListener {
-            mviStore.onNext(Wish.AddOne)
+            mviStore.onNext(MviCounterWish.AddOne)
         }
         findViewById<View>(R.id.add_one_slow).setOnClickListener {
-            mviStore.onNext(Wish.SlowAddOne)
+            mviStore.onNext(MviCounterWish.SlowAddOne)
         }
         findViewById<View>(R.id.remove_one).setOnClickListener {
-            mviStore.onNext(Wish.RemoveOne)
+            mviStore.onNext(MviCounterWish.RemoveOne)
         }
         findViewById<View>(R.id.remove_one_slow).setOnClickListener {
-            mviStore.onNext(Wish.SlowRemoveOne)
+            mviStore.onNext(MviCounterWish.SlowRemoveOne)
         }
         findViewById<View>(R.id.start_playback).setOnClickListener {
             timeTravel.startPlayback()

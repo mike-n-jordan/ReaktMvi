@@ -2,6 +2,8 @@ package com.jones.mvireaktive.middleware
 
 import com.badoo.reaktive.scheduler.Scheduler
 import com.badoo.reaktive.scheduler.singleScheduler
+import com.jones.mvireaktive.MviAction
+import com.jones.mvireaktive.builder.MviEventBuilder
 import com.jones.mvireaktive.StoreConfig
 import com.jones.mvireaktive.StoreConfigBuilder
 
@@ -29,8 +31,7 @@ object MiddlewareConfig {
         globalMiddleware.clear()
     }
 
-    private fun <State, Input: Any, BoundInput : Input, Output>
-            MviEventBuilder<State, Input, BoundInput, Output>.createAction() =
+    private fun <State, Input : Any, BoundInput : Input, Output> MviEventBuilder<State, Input, BoundInput, Output>.createAction() =
         MviAction(
             filter = filter,
             action = action,
