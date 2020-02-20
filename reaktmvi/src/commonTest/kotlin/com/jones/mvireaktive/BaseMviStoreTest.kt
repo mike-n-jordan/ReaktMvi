@@ -187,13 +187,14 @@ class BaseMviStoreTest {
     fun `when general post event is set, then it fires for all events`() {
         val store = createMviStore {
             on<Event.Other>()
+            on<Event.SlowAddOne>()
             on<Event.AddOne>()
                 .reducer { state, addOne -> state.copy(count = state.count + 1) }
-            post { state, event -> Event.AddOne }
+            post { state, event -> Event.AddOne.takeIf { event !is Event.AddOne } }
         }
 
         store.onNext(Event.Other)
-        store.onNext(Event.AddOne)
+        store.onNext(Event.SlowAddOne)
 
         assertEquals(expected = 2, actual = store.state.count)
     }
