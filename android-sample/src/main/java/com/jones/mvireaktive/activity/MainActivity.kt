@@ -5,20 +5,20 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.badoo.reaktive.disposable.CompositeDisposable
-import com.badoo.reaktive.disposable.plusAssign
+import com.badoo.reaktive.disposable.scope.DisposableScope
+import com.badoo.reaktive.disposable.scope.disposableScope
 import com.badoo.reaktive.observable.observeOn
-import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.scheduler.mainScheduler
 import com.jones.mvireaktive.activity.store.MviCounterStore
 import com.jones.mvireaktive.activity.store.MviCounterWish
 import com.jones.mvireaktive.middleware.MiddlewareConfig
 import com.jones.mvireaktive.middleware.timetravel.TimeTravelMiddleware
 
-class MainActivity : AppCompatActivity() {
+@Suppress("EXPERIMENTAL_API_USAGE")
+class MainActivity : AppCompatActivity(), DisposableScope by DisposableScope() {
 
     private lateinit var mviStore: MviCounterStore
-    private val disposable: CompositeDisposable = CompositeDisposable()
+    private var startStopScope: DisposableScope? = null
     private lateinit var counter: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         val timeTravel = TimeTravelMiddleware()
         MiddlewareConfig.registerGlobalMiddleware(timeTravel)
 
-        mviStore = MviCounterStore()
+        mviStore = MviCounterStore().scope()
         counter = findViewById(R.id.counter_value)
 
         findViewById<View>(R.id.add_one).setOnClickListener {
@@ -49,16 +49,28 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        disposable += mviStore.observeOn(mainScheduler).subscribe {
-            counter.text = it.count.toString()
-        }
-        disposable += mviStore.news.observeOn(mainScheduler).subscribe {
-            Toast.makeText(this, it::class.java.simpleName, Toast.LENGTH_SHORT).show()
+
+        startStopScope = disposableScope {
+            mviStore.observeOn(mainScheduler).subscribeScoped {
+                counter.text = it.count.toString()
+            }
+
+            mviStore.news.observeOn(mainScheduler).subscribeScoped {
+                Toast.makeText(this@MainActivity, it::class.java.simpleName, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     override fun onStop() {
+        startStopScope?.dispose()
+        startStopScope = null
+
         super.onStop()
-        disposable.clear()
+    }
+
+    override fun onDestroy() {
+        dispose()
+
+        super.onDestroy()
     }
 }
